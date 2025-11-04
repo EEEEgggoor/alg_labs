@@ -12,16 +12,13 @@ struct Edge {
     int weight;
 };
 
-// Функция для преобразования вектора рёбер в матрицу смежности
-vector<vector<int>> buildAdjacencyMatrix(const vector<Edge>& edges, int n) {
+vector<vector<int>> abjMatrix(const vector<Edge>& edges, int n) {
     vector<vector<int>> adjMatrix(n + 1, vector<int>(n + 1, INF));
     
-    // Инициализация: расстояние от вершины к самой себе равно 0
     for (int i = 1; i <= n; i++) {
         adjMatrix[i][i] = 0;
     }
     
-    // Заполнение матрицы смежности весами рёбер
     for (const auto& edge : edges) {
         adjMatrix[edge.from][edge.to] = edge.weight;
     }
@@ -29,7 +26,13 @@ vector<vector<int>> buildAdjacencyMatrix(const vector<Edge>& edges, int n) {
     return adjMatrix;
 }
 
-vector<int> solveIterative(int start, int end, const vector<vector<int>>& adjMatrix, int n) {
+vector<int> solveIterative(int start, int end, const vector<Edge>& Graph, int n) {
+
+
+    vector<vector<int>> adjMatrix = abjMatrix(Graph, n);
+
+
+
     vector<int> f(n + 1, INF);
     vector<int> f_prev(n + 1, INF);
     
@@ -79,11 +82,13 @@ vector<int> solveIterative(int start, int end, const vector<vector<int>>& adjMat
     return f;
 }
 
-vector<int> reconstructPath(int start, int end, const vector<int>& f, 
-                           const vector<vector<int>>& adjMatrix, int n) {
+vector<int> reconstructPath(int start, int end, const vector<int>& f, const vector<Edge>& Graph, int n) {
     vector<int> path;
     int current = start;
     path.push_back(current);
+
+    vector<vector<int>> adjMatrix = abjMatrix(Graph, n);
+
     
     while (current != end) {
         int next_vertex = -1;
@@ -136,28 +141,14 @@ int main() {
         {6, 7, 4}
     };
     
-    // Построение матрицы смежности
-    vector<vector<int>> adjMatrix = buildAdjacencyMatrix(Graph, n);
     
     int start = 1;
     int end = 7;
     
-    vector<int> f = solveIterative(start, end, adjMatrix, n);
+    vector<int> f = solveIterative(start, end, Graph, n);
     
-    vector<int> path = reconstructPath(start, end, f, adjMatrix, n);
+    vector<int> path = reconstructPath(start, end, f, Graph, n);
     
-    cout << "Матрица смежности:\n";
-    for (int i = 1; i <= n; i++) {
-        for (int j = 1; j <= n; j++) {
-            if (adjMatrix[i][j] == INF) {
-                cout << "INF\t";
-            } else {
-                cout << adjMatrix[i][j] << "\t";
-            }
-        }
-        cout << endl;
-    }
-    cout << endl;
     
     cout << "Кратчайшие расстояния от вершин до " << end << ":\n";
     for (int i = 1; i <= n; i++) {
