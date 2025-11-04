@@ -1,8 +1,11 @@
 #include <iostream>
 #include <vector>
 #include <limits>
+#include <chrono>
+
 
 using namespace std;
+using namespace std::chrono;
 
 const int INF = numeric_limits<int>::max();
 
@@ -144,9 +147,13 @@ int main() {
     
     int start = 1;
     int end = 7;
-    
+
+    auto start_timer = high_resolution_clock::now();
     vector<int> f = solveIterative(start, end, Graph, n);
+    auto end_timer = high_resolution_clock::now();
     
+    auto duration = duration_cast<microseconds>(end_timer - start_timer);
+
     vector<int> path = reconstructPath(start, end, f, Graph, n);
     
     
@@ -170,6 +177,7 @@ int main() {
         }
     }
     cout << "\n Общая длина: " << f[start] << endl;
+    cout << "\n Время работы: " << duration.count() << endl;
     
     return 0;
 }

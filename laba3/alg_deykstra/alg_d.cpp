@@ -2,8 +2,10 @@
 #include <algorithm>
 #include <limits>
 #include <vector>
+#include <chrono>
 
 using namespace std;
+using namespace std::chrono;
 
 typedef struct Edge{
     int in, out, weight;
@@ -98,7 +100,18 @@ int main(){
                             {6, 7, 0}, 
                             {7, 8, 2} };
 
+
+    auto start_timer = high_resolution_clock::now();
+
     deykstra(Graph, 8);
+    auto end_timer = high_resolution_clock::now();
+
+
+
+    auto duration = duration_cast<microseconds>(end_timer - start_timer);
+
+
+    cout << "\n Время работы: " << duration.count() << endl;
 
     return 0;
 }
