@@ -1,7 +1,7 @@
 #include <bits/stdc++.h>
 using namespace std;
 using ll = long long;
-const int INF = 1000000000;
+const int oo = 1000000000;
 
 struct Node {
     vector<vector<int>> mat;
@@ -17,6 +17,23 @@ struct CompareNode {
     }
 };
 
+
+void printMatrix(const std::vector<std::vector<int>>& matrix) {
+    for (const auto& row : matrix) {
+        for (int val : row) {
+            if (val == 1000000000)
+            {
+                std::cout << "oo" << " ";
+            }
+            else
+            {
+                std::cout << val << " ";
+            }
+        }
+        std::cout << "\n";
+    }
+}
+
 // Приведение матрицы: вычитает минимумы по строкам и столбцам.
 // Возвращает сумму всех вычитаний. Матрица mat модифицируется.
 ll reduce_matrix(vector<vector<int>>& mat) {
@@ -24,18 +41,18 @@ ll reduce_matrix(vector<vector<int>>& mat) {
     ll sum = 0;
     // приведение по строкам
     for (int i = 0; i < n; ++i) {
-        int mn = INF;
+        int mn = oo;
         for (int j = 0; j < n; ++j) if (mat[i][j] < mn) mn = mat[i][j];
-        if (mn == INF || mn == 0) continue;
-        for (int j = 0; j < n; ++j) if (mat[i][j] < INF) mat[i][j] -= mn;
+        if (mn == oo || mn == 0) continue;
+        for (int j = 0; j < n; ++j) if (mat[i][j] < oo) mat[i][j] -= mn;
         sum += mn;
     }
     // приведение по столбцам
     for (int j = 0; j < n; ++j) {
-        int mn = INF;
+        int mn = oo;
         for (int i = 0; i < n; ++i) if (mat[i][j] < mn) mn = mat[i][j];
-        if (mn == INF || mn == 0) continue;
-        for (int i = 0; i < n; ++i) if (mat[i][j] < INF) mat[i][j] -= mn;
+        if (mn == oo || mn == 0) continue;
+        for (int i = 0; i < n; ++i) if (mat[i][j] < oo) mat[i][j] -= mn;
         sum += mn;
     }
     return sum;
@@ -50,18 +67,18 @@ bool find_max_penalty_zero(const vector<vector<int>>& mat, int &out_i, int &out_
         if (mat[i][j] != 0) continue;
 
         // минимальный элемент в строке i, исключая столбец j
-        int rowMin = INF;
+        int rowMin = oo;
         for (int jj = 0; jj < n; ++jj) if (jj != j) rowMin = min(rowMin, mat[i][jj]);
 
         // минимальный элемент в столбце j, исключая строку i
-        int colMin = INF;
+        int colMin = oo;
         for (int ii = 0; ii < n; ++ii) if (ii != i) colMin = min(colMin, mat[ii][j]);
 
-        ll penalty = (ll)((rowMin==INF?INF:rowMin) + (colMin==INF?INF:colMin));
+        ll penalty = (ll)((rowMin==oo?oo:rowMin) + (colMin==oo?oo:colMin));
 
         // если строка или столбец имеют только ∞ (ребро недоступно)
-        if (rowMin==INF || colMin==INF) {
-            penalty = INF;
+        if (rowMin==oo || colMin==oo) {
+            penalty = oo;
         }
 
         if (!found || penalty > bestPenalty) {
@@ -124,8 +141,16 @@ pair<ll, vector<int>> branch_and_bound_tsp(const vector<vector<int>>& input) {
 
     // формируем начальную матрицу
     vector<vector<int>> base = input;
-    // заменяем отрицательные веса на INF (отсутствующие рёбра)
-    for (int i=0;i<n;++i) for (int j=0;j<n;++j) if (base[i][j] < 0) base[i][j]=INF;
+
+
+
+    // заменяем отрицательные веса на oo (отсутствующие рёбра)
+    for (int i=0;i<n;++i) for (int j=0;j<n;++j) if (base[i][j] < 0) base[i][j]=oo;
+
+    cout<<"НАЧ---------------------------------------"<<endl;
+
+    printMatrix(base);
+
 
     Node root;
     root.mat = base;
@@ -155,7 +180,7 @@ pair<ll, vector<int>> branch_and_bound_tsp(const vector<vector<int>>& input) {
                 bool ok = true;
                 for (int i = 0; i < n; ++i) {
                     int u = tour[i], v = tour[(i+1)%n];
-                    if (input[u][v] < 0 || input[u][v] >= INF) { ok=false; break; }
+                    if (input[u][v] < 0 || input[u][v] >= oo) { ok=false; break; }
                     total += input[u][v];
                 }
                 if (ok && total < bestCost) {
@@ -172,16 +197,19 @@ pair<ll, vector<int>> branch_and_bound_tsp(const vector<vector<int>>& input) {
 
         // ВЕТКА 1: ВКЛЮЧИТЬ ребро (zi, zj)
         {
-            Node child = cur;
+            cout<<"ВКЛ---------------------------------------"<<endl;
 
-            // включение ребра означает: строку zi и столбец zj → INF
+            Node child = cur;
+            // включение ребра означает: строку zi и столбец zj → oo
             for (int k = 0; k < n; ++k) {
-                child.mat[zi][k] = INF;
-                child.mat[k][zj] = INF;
+                child.mat[zi][k] = oo;
+                child.mat[k][zj] = oo;
             }
+            printMatrix(child.mat);
+
 
             // запрещаем обратное ребро (zj → zi), чтобы не получить цикл из двух вершин
-            child.mat[zj][zi] = INF;
+            child.mat[zj][zi] = oo;
 
             // обновляем next
             child.next[zi] = zj;
@@ -193,15 +221,41 @@ pair<ll, vector<int>> branch_and_bound_tsp(const vector<vector<int>>& input) {
                 child.cost = cur.cost + add;
                 if (child.cost < bestCost) pq.push(child);
             }
+            cout << "(" << zi+1 << ";" << zj+1 <<")"<<endl;
+            cout << cur.cost<<endl;
+            // for (int t : cur.next) {cout << t << " ";}
+            cout<<endl;
+            cout<<endl;
+            printMatrix(child.mat);
+            cout<<endl;
+            cout<<"---------------------------------------"<<endl;
+
         }
 
         // ВЕТКА 2: ИСКЛЮЧИТЬ ребро (zi, zj)
-        {
+        {   
+
+            cout<<"ИСКЛ---------------------------------------"<<endl;
+
             Node child = cur;
-            child.mat[zi][zj] = INF;
+            printMatrix(child.mat);
+
+            child.mat[zi][zj] = oo;
             ll add = reduce_matrix(child.mat);
             child.cost = cur.cost + add;
             if (child.cost < bestCost) pq.push(child);
+            cout << "*(" << zi+1 << ";" << zj+1 <<")"<<endl;
+
+            cout << cur.cost<<endl;
+            // for (int t : cur.next) {cout << t << " ";}
+            cout<<endl;
+            cout<<endl;
+            printMatrix(child.mat);
+            cout<<endl;
+            cout<<endl;
+            cout<<"---------------------------------------"<<endl;
+
+
         }
 
         if (nodesProcessed > 2000000) break; // защитное ограничение
@@ -213,14 +267,16 @@ pair<ll, vector<int>> branch_and_bound_tsp(const vector<vector<int>>& input) {
 
 
 int main() {
-    vector<vector<int>> mat =
-        {{-1, 7, 12, 25, 10},
-        {10, -1, 9, 5, 11,},
-        {13, 8, -1, 6, 4},
-        {6, 11, 15, -1, 15},
-        {5, 9, 12, 17, -1}};
+    vector<vector<int>> mat = {
+        {-1, 23, 47, -1, 62, 38},
+        {51, -1, 74, 19, 88, 33},
+        {67, 42, -1, 56, -1, 91},
+        {29, 71, 14, -1, 83, 52},
+        {64, -1, 87, 95, -1, 46},
+        {92, 57, 26, 73, 68, -1}
+    };
 
-    int n = 5;
+    int n = 6;
 
     auto res2 = branch_and_bound_tsp(mat);
     if (res2.first < 0) cout << "Нет допустимого тура или рёбра отсутствуют\n";
