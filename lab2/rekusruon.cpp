@@ -7,12 +7,10 @@ using namespace std;
 using namespace chrono;
 using namespace boost::multiprecision;
 
-// Тип с высокой точностью (100 знаков после запятой)
+
 using bigfloat = cpp_dec_float_100;
 
-// ------------------------------
-// Итеративный алгоритм
-// ------------------------------
+
 bigfloat iteration(int n) {
     bigfloat fact = 1;
     for (int i = 1; i <= n; i++) fact *= i;
@@ -20,17 +18,13 @@ bigfloat iteration(int n) {
     return fact / denom;
 }
 
-// ------------------------------
-// Рекурсивный алгоритм
-// ------------------------------
+
 bigfloat recursion(int n) {
     if (n == 0) return 1;
     return bigfloat(n) * recursion(n - 1) / 2;
 }
 
-// ------------------------------
-// Главная функция
-// ------------------------------
+
 int main() {
 
 
